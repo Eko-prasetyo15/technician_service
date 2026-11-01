@@ -167,6 +167,35 @@ class DatabaseManager {
     await this.processReminders();
   }
 
+  public async refresh(): Promise<void> {
+    const settings = await pool.query<{ data: { currentUserId: string } }>(
+      "SELECT data FROM app_settings WHERE id = 'main'"
+    );
+    if (!settings.rowCount) {
+      throw new Error('Neon database has not been initialized.');
+    }
+
+    const collections = await Promise.all(
+      COLLECTIONS.map(async (table) => {
+        const result = await pool.query<{ id: string; data: unknown }>(`SELECT id, data FROM ${table}`);
+        return [table, result.rows] as const;
+      })
+    );
+    const loaded = Object.fromEntries(collections) as Record<Collection, { id: string; data: unknown }[]>;
+    this.data = {
+      categories: loaded.categories.map((row) => row.data as EquipmentCategory),
+      equipment: loaded.equipment.map((row) => row.data as Equipment),
+      schedules: loaded.schedules.map((row) => row.data as ServiceSchedule),
+      reports: loaded.reports.map((row) => row.data as ServiceReport),
+      reminders: loaded.reminders.map((row) => row.data as ServiceReminder),
+      users: loaded.users.map((row) => row.data as User),
+      company: (loaded.company_settings[0]?.data as CompanySettings | undefined) || initialCompanySettings,
+      currentUserId: settings.rows[0].data.currentUserId,
+    };
+    this.persistedData = clone(this.data);
+    this.companySettingsInitialized = loaded.company_settings.length > 0;
+  }
+
   private async persistSnapshot(state: DatabaseSchema): Promise<void> {
     const client: PoolClient = await pool.connect();
     try {
