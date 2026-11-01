@@ -1,0 +1,617 @@
+{
+  "createdAt": "2026-10-31T14:54:42.508Z",
+  "tables": {
+    "categories": [
+      {
+        "id": "cat-elec",
+        "data": {
+          "id": "cat-elec",
+          "code": "ELEC",
+          "name": "Electrical & Power",
+          "iconName": "Zap",
+          "description": "Genset, Trafo, Panel Distribusi MDP/SDP, UPS & Inverter"
+        }
+      },
+      {
+        "id": "cat-hvac",
+        "data": {
+          "id": "cat-hvac",
+          "code": "HVAC",
+          "name": "HVAC & Pendingin",
+          "iconName": "Wind",
+          "description": "Chiller, AC Central, VRV/VRF, Split Duct, Cold Storage"
+        }
+      },
+      {
+        "id": "cat-mech",
+        "data": {
+          "id": "cat-mech",
+          "code": "MECH",
+          "name": "Mekanikal & Fire Safety",
+          "iconName": "Wrench",
+          "description": "Kompresor, Boiler, Pompa Hydrant, Exhaust Fan Industri"
+        }
+      },
+      {
+        "id": "cat-plumb",
+        "data": {
+          "id": "cat-plumb",
+          "code": "PLMB",
+          "name": "Plumbing & Air Bersih",
+          "iconName": "Droplets",
+          "description": "Pompa Booster, Pompa Transfer, Water Filter, Sewage Treatment"
+        }
+      }
+    ],
+    "equipment": [
+      {
+        "id": "eq-001",
+        "data": {
+          "id": "eq-001",
+          "name": "Chiller Water Cooled Daikin 120 TR",
+          "brand": "Daikin McQuay",
+          "model": "WMC-120C",
+          "notes": "Unit pendingin utama gedung perkantoran. Gunakan refrigerant R134a.",
+          "status": "active",
+          "capacity": "120 TR / 422 kW",
+          "location": "Rooftop Gedung Utama A",
+          "createdAt": "2026-01-10T08:00:00Z",
+          "categoryId": "cat-hvac",
+          "categoryName": "HVAC & Pendingin",
+          "serialNumber": "DKN-2023-CH-0891",
+          "lastServiceDate": "2026-10-05",
+          "nextServiceDate": "2026-11-04",
+          "installationDate": "2023-03-15",
+          "maintenanceIntervalDays": 30
+        }
+      },
+      {
+        "id": "eq-002",
+        "data": {
+          "id": "eq-002",
+          "name": "Generator Set Cummins 500 kVA",
+          "brand": "Cummins PowerCommand",
+          "model": "C500 D5",
+          "notes": "Wajib pemanasan berkala (warm-up run) 15 menit setiap 2 minggu. Cek oli & solar.",
+          "status": "active",
+          "capacity": "500 kVA / 400 kW",
+          "location": "Ruang Powerhouse Basement 1",
+          "createdAt": "2026-01-10T08:00:00Z",
+          "categoryId": "cat-elec",
+          "categoryName": "Electrical & Power",
+          "serialNumber": "CMS-ENG-882104",
+          "lastServiceDate": "2026-10-18",
+          "nextServiceDate": "2026-11-01",
+          "installationDate": "2022-08-20",
+          "maintenanceIntervalDays": 14
+        }
+      },
+      {
+        "id": "eq-003",
+        "data": {
+          "id": "eq-003",
+          "name": "AC Precision Server Room Lt. 2",
+          "brand": "Vertiv Liebert",
+          "model": "PEX4 35kW",
+          "notes": "Kritis untuk suhu server (suhu target 20°C ± 1°C). Cek filter udara dan kelembaban.",
+          "status": "active",
+          "capacity": "35 kW (Downflow)",
+          "location": "Data Center Lt. 2",
+          "createdAt": "2026-01-15T09:00:00Z",
+          "categoryId": "cat-hvac",
+          "categoryName": "HVAC & Pendingin",
+          "serialNumber": "LBT-CRAC-7732",
+          "lastServiceDate": "2026-10-25",
+          "nextServiceDate": "2026-11-08",
+          "installationDate": "2024-01-12",
+          "maintenanceIntervalDays": 14
+        }
+      },
+      {
+        "id": "eq-004",
+        "data": {
+          "id": "eq-004",
+          "name": "Main Distribution Panel (MDP) 800A",
+          "brand": "Schneider Electric",
+          "model": "Prisma Plus P 800A",
+          "notes": "Lakukan thermovision (thermal imaging) pada busbar sambungan dan MCCB.",
+          "status": "active",
+          "capacity": "800 Ampere / 3-Phase",
+          "location": "Ruang Trafo Lt. Dasar",
+          "createdAt": "2026-01-10T08:00:00Z",
+          "categoryId": "cat-elec",
+          "categoryName": "Electrical & Power",
+          "serialNumber": "SCH-MDP-2022-01",
+          "lastServiceDate": "2026-09-02",
+          "nextServiceDate": "2026-11-02",
+          "installationDate": "2022-05-10",
+          "maintenanceIntervalDays": 60
+        }
+      },
+      {
+        "id": "eq-005",
+        "data": {
+          "id": "eq-005",
+          "name": "Pompa Hydrant Diesel Clarke 750 GPM",
+          "brand": "Clarke Fire Pumps",
+          "model": "JU4H-UFH0",
+          "notes": "Sistem proteksi kebakaran gedung. Uji starter aki otomatis dan tekanan pressure relief.",
+          "status": "active",
+          "capacity": "750 GPM @ 10 Bar",
+          "location": "Ruang Pompa Pemadam Basement 2",
+          "createdAt": "2026-01-10T08:00:00Z",
+          "categoryId": "cat-mech",
+          "categoryName": "Mekanikal & Fire Safety",
+          "serialNumber": "CLK-FD-4401",
+          "lastServiceDate": "2026-09-28",
+          "nextServiceDate": "2026-10-28",
+          "installationDate": "2022-04-18",
+          "maintenanceIntervalDays": 30
+        }
+      },
+      {
+        "id": "eq-006",
+        "data": {
+          "id": "eq-006",
+          "name": "Pompa Transfer Air Bersih Grundfos",
+          "brand": "Grundfos",
+          "model": "CR 15-7",
+          "notes": "Menyuplai tandon atas rooftop dari ground water tank. Cek mechanical seal.",
+          "status": "active",
+          "capacity": "15 m³/jam @ head 85m",
+          "location": "Ruang Pompa Transfer Basement 1",
+          "createdAt": "2026-01-12T08:00:00Z",
+          "categoryId": "cat-plumb",
+          "categoryName": "Plumbing & Air Bersih",
+          "serialNumber": "GF-CR15-9921",
+          "lastServiceDate": "2026-10-10",
+          "nextServiceDate": "2026-11-09",
+          "installationDate": "2023-07-04",
+          "maintenanceIntervalDays": 30
+        }
+      },
+      {
+        "id": "eq-007",
+        "data": {
+          "id": "eq-007",
+          "name": "Kompresor Udara Pabrik Atlas Copco",
+          "brand": "Atlas Copco",
+          "model": "GA11+ Rotary Screw",
+          "notes": "Suplai pneumatic mesin pabrik. Kuras air tangki receiver dan ganti oil separator.",
+          "status": "active",
+          "capacity": "11 kW / 1.7 m³/min @ 8 bar",
+          "location": "Area Utility Workshop Produksi",
+          "createdAt": "2026-02-01T08:00:00Z",
+          "categoryId": "cat-mech",
+          "categoryName": "Mekanikal & Fire Safety",
+          "serialNumber": "AC-GA11-309",
+          "lastServiceDate": "2026-10-02",
+          "nextServiceDate": "2026-11-01",
+          "installationDate": "2023-11-15",
+          "maintenanceIntervalDays": 30
+        }
+      },
+      {
+        "id": "eq-008",
+        "data": {
+          "id": "eq-008",
+          "name": "UPS Gedung Riello Multi Sentry 60kVA",
+          "brand": "Riello UPS",
+          "model": "MST 60kVA V1",
+          "notes": "Ukur impedansi internal bank baterai 40x12V dan uji transfer switch bypass.",
+          "status": "active",
+          "capacity": "60 kVA / 54 kW",
+          "location": "Ruang UPS Data Center Lt. 2",
+          "createdAt": "2026-01-15T08:00:00Z",
+          "categoryId": "cat-elec",
+          "categoryName": "Electrical & Power",
+          "serialNumber": "RL-UPS-60-12",
+          "lastServiceDate": "2026-09-15",
+          "nextServiceDate": "2026-10-30",
+          "installationDate": "2023-09-01",
+          "maintenanceIntervalDays": 45
+        }
+      }
+    ],
+    "schedules": [
+      {
+        "id": "sch-001",
+        "data": {
+          "id": "sch-001",
+          "notes": "Pemeriksaan level pelumas SAE 15W-40, tegangan baterai starter 24V, dan pemanasan beban nol selama 15 menit.",
+          "title": "Warm-up Run & Pengecekan Sistem Solar Genset 500 kVA",
+          "status": "Scheduled",
+          "jobType": "Preventive Maintenance",
+          "location": "Ruang Powerhouse Basement 1",
+          "priority": "High",
+          "createdAt": "2026-10-25T10:00:00Z",
+          "equipmentId": "eq-002",
+          "technicianId": "usr-irfan",
+          "equipmentName": "Generator Set Cummins 500 kVA",
+          "scheduledDate": "2026-11-01",
+          "scheduledTime": "09:00",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "sch-002",
+        "data": {
+          "id": "sch-002",
+          "notes": "Jadwal rutin bulanan terlambat 3 hari. Cek panel pengendali otomatis Metron dan sirkulasi pendingin engine.",
+          "title": "Inspeksi Kritis & Uji Aliran Pompa Hydrant Diesel",
+          "status": "In Progress",
+          "jobType": "Inspection",
+          "location": "Ruang Pompa Pemadam Basement 2",
+          "priority": "Emergency",
+          "createdAt": "2026-10-20T08:30:00Z",
+          "equipmentId": "eq-005",
+          "technicianId": "usr-irfan",
+          "equipmentName": "Pompa Hydrant Diesel Clarke 750 GPM",
+          "scheduledDate": "2026-10-28",
+          "scheduledTime": "10:30",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "sch-003",
+        "data": {
+          "id": "sch-003",
+          "notes": "Bersihkan strainer air pendingin cooling tower dan ukur delta T air masuk/keluar chiller evaporator.",
+          "title": "Pembersihan Kondensor & Cek Suhu Chiller Daikin 120 TR",
+          "status": "Scheduled",
+          "jobType": "Preventive Maintenance",
+          "location": "Rooftop Gedung Utama A",
+          "priority": "Medium",
+          "createdAt": "2026-10-26T11:00:00Z",
+          "equipmentId": "eq-001",
+          "technicianId": "usr-irfan",
+          "equipmentName": "Chiller Water Cooled Daikin 120 TR",
+          "scheduledDate": "2026-11-04",
+          "scheduledTime": "13:00",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "sch-004",
+        "data": {
+          "id": "sch-004",
+          "notes": "Pengujian ketahanan sel baterai dan pembersihan debu internal inverter.",
+          "title": "Pengecekan Baterai & Kalibrasi UPS 60kVA Data Center",
+          "status": "Scheduled",
+          "jobType": "Preventive Maintenance",
+          "location": "Ruang UPS Data Center Lt. 2",
+          "priority": "High",
+          "createdAt": "2026-10-22T09:15:00Z",
+          "equipmentId": "eq-008",
+          "technicianId": "usr-irfan",
+          "equipmentName": "UPS Gedung Riello Multi Sentry 60kVA",
+          "scheduledDate": "2026-10-30",
+          "scheduledTime": "14:00",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "sch-005",
+        "data": {
+          "id": "sch-005",
+          "notes": "Pemeriksaan v-belt tension, pembersihan filter udara intake, dan cek drainase kondensat otomatis.",
+          "title": "Maintenance Berkala Kompresor Atlas Copco GA11+",
+          "status": "Scheduled",
+          "jobType": "Preventive Maintenance",
+          "location": "Area Utility Workshop Produksi",
+          "priority": "Medium",
+          "createdAt": "2026-10-27T08:00:00Z",
+          "equipmentId": "eq-007",
+          "technicianId": "usr-irfan",
+          "equipmentName": "Kompresor Udara Pabrik Atlas Copco",
+          "scheduledDate": "2026-11-01",
+          "scheduledTime": "11:00",
+          "technicianName": "Irfan"
+        }
+      }
+    ],
+    "reports": [
+      {
+        "id": "rep-001",
+        "data": {
+          "id": "rep-001",
+          "photos": [
+            {
+              "id": "p-1",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457903/internal-technician-service-app/reports/nb4duch4ufvfw8av4ytr.svg",
+              "stage": "before",
+              "caption": "Kondisi kisi-kisi dan pre-filter sebelum dibersihkan",
+              "publicId": "internal-technician-service-app/reports/nb4duch4ufvfw8av4ytr",
+              "timestamp": "2026-10-25T14:35:00Z"
+            },
+            {
+              "id": "p-2",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457906/internal-technician-service-app/reports/id35tiursi9kkx9v5prg.svg",
+              "stage": "during",
+              "caption": "Pengisian ulang freon R410A dan pengetesan arus kompresor",
+              "publicId": "internal-technician-service-app/reports/id35tiursi9kkx9v5prg",
+              "timestamp": "2026-10-25T15:10:00Z"
+            },
+            {
+              "id": "p-3",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457907/internal-technician-service-app/reports/ufz9ax4hijtipzayngqm.svg",
+              "stage": "after",
+              "caption": "Display mikrokontroler menunjukkan suhu stabil 19.8°C",
+              "publicId": "internal-technician-service-app/reports/ufz9ax4hijtipzayngqm",
+              "timestamp": "2026-10-25T16:00:00Z"
+            }
+          ],
+          "status": "Submitted",
+          "jobDate": "2026-10-25",
+          "jobTime": "14:30",
+          "jobType": "Preventive Maintenance",
+          "findings": "Filter udara pre-filter kotor tebal. Tekanan suction refrigeran R410A sedikit turun ke 115 psi (normal 125 psi). Arus kompresor 18.2 Ampere.",
+          "location": "Data Center Lt. 2",
+          "syncedAt": "2026-10-25T16:05:00Z",
+          "createdAt": "2026-10-25T16:00:00Z",
+          "brandModel": "Vertiv Liebert PEX4 35kW",
+          "spareParts": "Refrigerant R410A (350 gr), Contact Cleaner 400ml, Filter Mat G4 (1 set)",
+          "actionTaken": "1. Pembersihan cuci filter udara pre-filter dengan tekanan rendah.\n2. Pemeriksaan kebocoran flare nut menggunakan leak detector (tidak bocor).\n3. Penambahan refrigeran R410A sebanyak 350 gram hingga suction stabil pada 126 psi.\n4. Pelumasan bearing blower fan motor.",
+          "equipmentId": "eq-003",
+          "categoryName": "HVAC & Pendingin",
+          "reportNumber": "SRV-202610-001",
+          "serialNumber": "LBT-CRAC-7732",
+          "technicianId": "usr-irfan",
+          "equipmentName": "AC Precision Server Room Lt. 2",
+          "conditionAfter": "Suhu supply udara 12.2°C, suhu ruangan server kembali stabil pada 19.8°C, getaran blower fan normal dan tidak bising.",
+          "technicianName": "Irfan",
+          "additionalNotes": "Disaksikan oleh Staf IT Data Center (Bpk. Dimas).",
+          "conditionBefore": "Unit AC beroperasi namun terdengar dengungan halus pada kipas kondensor, filter udara tersumbat debu 40%, suhu ruangan server 22.8°C.",
+          "recommendations": "Ganti filter cartridge hepa pada service 3 bulan mendatang. Catat log temperatur harian sensor BMS."
+        }
+      },
+      {
+        "id": "rep-002",
+        "data": {
+          "id": "rep-002",
+          "photos": [
+            {
+              "id": "p-4",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457909/internal-technician-service-app/reports/bzlube525efv9fgud4zo.svg",
+              "stage": "before",
+              "caption": "Kondisi aki starter 24V sebelum top-up cairan",
+              "publicId": "internal-technician-service-app/reports/bzlube525efv9fgud4zo",
+              "timestamp": "2026-10-18T10:05:00Z"
+            },
+            {
+              "id": "p-5",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457911/internal-technician-service-app/reports/jqtjdqkxutdzxgx6qqul.svg",
+              "stage": "during",
+              "caption": "Mesin sedang running test pada 1500 RPM",
+              "publicId": "internal-technician-service-app/reports/jqtjdqkxutdzxgx6qqul",
+              "timestamp": "2026-10-18T10:30:00Z"
+            },
+            {
+              "id": "p-6",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457912/internal-technician-service-app/reports/kf7ucdr7kd6nunojaa7k.svg",
+              "stage": "after",
+              "caption": "Panel PowerCommand menunjukkan status Ready for Auto",
+              "publicId": "internal-technician-service-app/reports/kf7ucdr7kd6nunojaa7k",
+              "timestamp": "2026-10-18T11:00:00Z"
+            }
+          ],
+          "status": "Submitted",
+          "jobDate": "2026-10-18",
+          "jobTime": "10:00",
+          "jobType": "Preventive Maintenance",
+          "findings": "Aki starter butuh penambahan air aki demineralisasi. Filter solar sekunder mulai terlihat endapan tipis.",
+          "location": "Ruang Powerhouse Basement 1",
+          "syncedAt": "2026-10-18T11:10:00Z",
+          "createdAt": "2026-10-18T11:00:00Z",
+          "brandModel": "Cummins PowerCommand C500 D5",
+          "spareParts": "Air Aki Demineralized 1 Liter, Gemuk Terminal Baterai",
+          "actionTaken": "1. Top-up air aki demineralisasi sebanyak 250ml.\n2. Uji running mesin tanpa beban selama 15 menit. RPM stabil 1500 RPM, frekuensi 50.1 Hz, tegangan line-to-line 398 VAC.\n3. Uji pemindahan otomatis ATS switch simulasi genset.",
+          "equipmentId": "eq-002",
+          "categoryName": "Electrical & Power",
+          "reportNumber": "SRV-202610-002",
+          "serialNumber": "CMS-ENG-882104",
+          "technicianId": "usr-irfan",
+          "equipmentName": "Generator Set Cummins 500 kVA",
+          "conditionAfter": "Mesin beroperasi sempurna saat simulasi pemanasan, tekanan oli mesin 4.2 bar, temperatur radiator 82°C aman.",
+          "technicianName": "Irfan",
+          "additionalNotes": "Checksheet genset mingguan telah ditandatangani security pos barat.",
+          "conditionBefore": "Genset dalam kondisi standby, level solar tangki harian 85%, air aki starter cell #3 sedikit rendah.",
+          "recommendations": "Jadwalkan penggantian oli mesin dan filter oli pada bulan Desember (mencapai 250 jam kerja)."
+        }
+      },
+      {
+        "id": "rep-003",
+        "data": {
+          "id": "rep-003",
+          "photos": [
+            {
+              "id": "p-7",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457914/internal-technician-service-app/reports/xtyc0obf4v3lufwqz33g.svg",
+              "stage": "before",
+              "caption": "Kebocoran rembesan air pada shaft seal",
+              "publicId": "internal-technician-service-app/reports/xtyc0obf4v3lufwqz33g",
+              "timestamp": "2026-10-10T11:20:00Z"
+            },
+            {
+              "id": "p-8",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457916/internal-technician-service-app/reports/g4zys5yajycqlk8vnjyy.svg",
+              "stage": "during",
+              "caption": "Pemasangan seal cartridge baru HQQE",
+              "publicId": "internal-technician-service-app/reports/g4zys5yajycqlk8vnjyy",
+              "timestamp": "2026-10-10T12:00:00Z"
+            },
+            {
+              "id": "p-9",
+              "url": "https://res.cloudinary.com/syvfskec/image/upload/v1793457917/internal-technician-service-app/reports/xve0nk65zynv9dcgewfy.svg",
+              "stage": "after",
+              "caption": "Area shaft kering dan running test berhasil tanpa bocor",
+              "publicId": "internal-technician-service-app/reports/xve0nk65zynv9dcgewfy",
+              "timestamp": "2026-10-10T12:45:00Z"
+            }
+          ],
+          "status": "Submitted",
+          "jobDate": "2026-10-10",
+          "jobTime": "11:15",
+          "jobType": "Corrective Maintenance",
+          "findings": "Mechanical seal aus akibat pasir halus dari sumber air tanah. Tekanan debit pompa turun dari 8 bar ke 6.8 bar.",
+          "location": "Ruang Pompa Transfer Basement 1",
+          "syncedAt": "2026-10-10T12:50:00Z",
+          "createdAt": "2026-10-10T12:45:00Z",
+          "brandModel": "Grundfos CR 15-7",
+          "spareParts": "Cartridge Mechanical Seal Grundfos HQQE (Part No. 96511840)",
+          "actionTaken": "1. Isolasi valve suction dan discharge pompa.\n2. Pembongkaran coupling motor dan cartridge seal chamber.\n3. Penggantian mechanical seal kit Grundfos HQQE.\n4. Uji tekanan running pompa selama 30 menit (tekanan stabil 8.2 bar tanpa kebocoran).",
+          "equipmentId": "eq-006",
+          "categoryName": "Plumbing & Air Bersih",
+          "reportNumber": "SRV-202610-003",
+          "serialNumber": "GF-CR15-9921",
+          "technicianId": "usr-irfan",
+          "equipmentName": "Pompa Transfer Air Bersih Grundfos",
+          "conditionAfter": "Pompa transfer kering, tidak ada tetesan air, vibrasi motor sangat halus pada 1.2 mm/s.",
+          "technicianName": "Irfan",
+          "additionalNotes": "Pompa cadangan Unit B tetap standby aktif selama perbaikan.",
+          "conditionBefore": "Tetesan air terlihat pada area gland packing/mechanical seal saat pompa transfer beroperasi mengisi tandon rooftop.",
+          "recommendations": "Lakukan backwash filter pasir sedimentasi setiap minggu untuk memperpanjang usia seal pompa."
+        }
+      }
+    ],
+    "reminders": [
+      {
+        "id": "rem-1793454057645-18fr7",
+        "data": {
+          "id": "rem-1793454057645-18fr7",
+          "type": "3_days",
+          "status": "pending",
+          "dueDate": "2026-11-02",
+          "location": "Ruang Trafo Lt. Dasar",
+          "createdAt": "2026-10-31T13:40:57.645Z",
+          "equipmentId": "eq-004",
+          "categoryName": "Electrical & Power",
+          "daysRemaining": 2,
+          "equipmentName": "Main Distribution Panel (MDP) 800A"
+        }
+      },
+      {
+        "id": "rem-1793454057645-bevyq",
+        "data": {
+          "id": "rem-1793454057645-bevyq",
+          "type": "overdue",
+          "status": "pending",
+          "dueDate": "2026-10-28",
+          "location": "Ruang Pompa Pemadam Basement 2",
+          "createdAt": "2026-10-31T13:40:57.645Z",
+          "scheduleId": "sch-002",
+          "equipmentId": "eq-005",
+          "categoryName": "Mekanikal & Fire Safety",
+          "daysRemaining": -3,
+          "equipmentName": "Pompa Hydrant Diesel Clarke 750 GPM",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "rem-1793454057645-h8k34",
+        "data": {
+          "id": "rem-1793454057645-h8k34",
+          "type": "1_day",
+          "status": "pending",
+          "dueDate": "2026-11-01",
+          "location": "Area Utility Workshop Produksi",
+          "createdAt": "2026-10-31T13:40:57.645Z",
+          "scheduleId": "sch-005",
+          "equipmentId": "eq-007",
+          "categoryName": "Mekanikal & Fire Safety",
+          "daysRemaining": 1,
+          "equipmentName": "Kompresor Udara Pabrik Atlas Copco",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "rem-1793454057645-jxyje",
+        "data": {
+          "id": "rem-1793454057645-jxyje",
+          "type": "overdue",
+          "status": "pending",
+          "dueDate": "2026-10-30",
+          "location": "Ruang UPS Data Center Lt. 2",
+          "createdAt": "2026-10-31T13:40:57.645Z",
+          "scheduleId": "sch-004",
+          "equipmentId": "eq-008",
+          "categoryName": "Electrical & Power",
+          "daysRemaining": -1,
+          "equipmentName": "UPS Gedung Riello Multi Sentry 60kVA",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "rem-1793454057645-mpkhm",
+        "data": {
+          "id": "rem-1793454057645-mpkhm",
+          "type": "7_days",
+          "status": "pending",
+          "dueDate": "2026-11-04",
+          "location": "Rooftop Gedung Utama A",
+          "createdAt": "2026-10-31T13:40:57.645Z",
+          "scheduleId": "sch-003",
+          "equipmentId": "eq-001",
+          "categoryName": "HVAC & Pendingin",
+          "daysRemaining": 4,
+          "equipmentName": "Chiller Water Cooled Daikin 120 TR",
+          "technicianName": "Irfan"
+        }
+      },
+      {
+        "id": "rem-1793454057645-xf6f5",
+        "data": {
+          "id": "rem-1793454057645-xf6f5",
+          "type": "1_day",
+          "status": "pending",
+          "dueDate": "2026-11-01",
+          "location": "Ruang Powerhouse Basement 1",
+          "createdAt": "2026-10-31T13:40:57.645Z",
+          "scheduleId": "sch-001",
+          "equipmentId": "eq-002",
+          "categoryName": "Electrical & Power",
+          "daysRemaining": 1,
+          "equipmentName": "Generator Set Cummins 500 kVA",
+          "technicianName": "Irfan"
+        }
+      }
+    ],
+    "users": [
+      {
+        "id": "usr-irfan",
+        "data": {
+          "id": "usr-irfan",
+          "name": "Irfan",
+          "role": "technician",
+          "email": "irfan.teknisi@perusahaan.co.id",
+          "phone": "081234567890",
+          "status": "active",
+          "specialization": "Teknisi & Maintenance Engineer"
+        }
+      }
+    ],
+    "company_settings": [
+      {
+        "id": "main",
+        "data": {
+          "email": "facility@cahayaperdana.co.id",
+          "phone": "(021) 460-2345 / 0812-3456-7890",
+          "branch": "Kantor Pusat & Fasilitas Produksi",
+          "address": "Kawasan Industri Pulogadung Blok B No. 12, Jakarta Timur 13920",
+          "picName": "Eko Prasetyo, S.T.",
+          "picTitle": "Kepala Divisi Pemeliharaan Fasilitas",
+          "headerNote": "DIVISI PEMELIHARAAN FASILITAS & TEKNIK INTERNAL",
+          "companyName": "PT CAHAYA PERDANA NUSANTARA"
+        }
+      }
+    ],
+    "app_settings": [
+      {
+        "id": "main",
+        "data": {
+          "currentUserId": "usr-irfan"
+        }
+      }
+    ]
+  }
+}
