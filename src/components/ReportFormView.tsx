@@ -256,8 +256,12 @@ export const ReportFormView: React.FC<ReportFormViewProps> = ({
       brandModel: `${currentEquipment.brand} ${currentEquipment.model}`,
       serialNumber: currentEquipment.serialNumber,
       location: currentEquipment.location,
-      technicianId: currentUser?.id || 'usr-irfan',
-      technicianName: currentUser?.name || 'Irfan Rusmana',
+      technicianId: schedules.find((schedule) => schedule.id === selectedScheduleId)?.technicianId
+        || currentUser?.id
+        || 'usr-irfan',
+      technicianName: schedules.find((schedule) => schedule.id === selectedScheduleId)?.technicianName
+        || currentUser?.name
+        || 'Irfan Rusmana',
       jobDate,
       jobTime,
       jobType,

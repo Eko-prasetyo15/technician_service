@@ -21,6 +21,7 @@ import {
   Trash2, 
   X,
   User as UserIcon,
+  UsersRound,
   Filter,
   LoaderCircle
 } from 'lucide-react';
@@ -28,7 +29,9 @@ import {
 interface ScheduleViewProps {
   schedules: ServiceSchedule[];
   equipment: Equipment[];
+  technicians: User[];
   currentUser: User | null;
+  onManageTechnicians: () => void;
   onSaveSchedule: (data: Partial<ServiceSchedule>, isEdit: boolean) => Promise<void>;
   onDeleteSchedule: (id: string) => Promise<void>;
   onStartReportFromSchedule: (schedule: ServiceSchedule) => void;
@@ -37,7 +40,9 @@ interface ScheduleViewProps {
 export const ScheduleView: React.FC<ScheduleViewProps> = ({
   schedules,
   equipment,
+  technicians,
   currentUser,
+  onManageTechnicians,
   onSaveSchedule,
   onDeleteSchedule,
   onStartReportFromSchedule,
@@ -54,7 +59,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   const [formData, setFormData] = useState<Partial<ServiceSchedule>>({
     title: '',
     equipmentId: equipment[0]?.id || '',
-    technicianId: 'usr-irfan',
+    technicianId: currentUser?.id || 'usr-irfan',
     technicianName: currentUser?.name || 'Irfan Rusmana',
     scheduledDate: new Date().toISOString().split('T')[0],
     scheduledTime: '09:00',
@@ -70,7 +75,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
     setFormData({
       title: firstEq ? `Perawatan Rutin ${firstEq.name}` : 'Maintenance Rutin',
       equipmentId: firstEq?.id || '',
-      technicianId: 'usr-irfan',
+      technicianId: currentUser?.id || 'usr-irfan',
       technicianName: currentUser?.name || 'Irfan Rusmana',
       scheduledDate: new Date().toISOString().split('T')[0],
       scheduledTime: '09:00',
@@ -88,6 +93,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
       title: sch.title,
       equipmentId: sch.equipmentId,
       technicianId: sch.technicianId,
+      technicianName: sch.technicianName,
       scheduledDate: sch.scheduledDate,
       scheduledTime: sch.scheduledTime,
       jobType: sch.jobType,
@@ -114,8 +120,10 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
           ...formData,
           equipmentName: eq?.name || '',
           location: eq?.location || '',
-          technicianId: currentUser?.id || 'usr-irfan',
-          technicianName: currentUser?.name || 'Irfan Rusmana',
+          technicianId: formData.technicianId || currentUser?.id || 'usr-irfan',
+          technicianName: technicians.find((technician) => technician.id === formData.technicianId)?.name
+            || currentUser?.name
+            || 'Irfan Rusmana',
           ...(editingSchedule ? { id: editingSchedule.id } : {}),
         },
         !!editingSchedule
@@ -157,7 +165,14 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={onManageTechnicians}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
+          >
+            <UsersRound className="h-4 w-4 text-sky-600" />
+            <span>Tim Teknisi</span>
+          </button>
           {/* View toggle */}
           <div className="inline-flex rounded-xl bg-slate-200/80 p-1 text-slate-700">
             <button
@@ -452,10 +467,20 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   <label className="block font-semibold text-slate-700 mb-1">
                     Teknisi Pelaksana
                   </label>
-                  <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-bold flex items-center justify-between">
-                    <span>{currentUser?.name || 'Irfan Rusmana'}</span>
-                    <span className="text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full font-semibold">Teknisi Maintenance</span>
-                  </div>
+                  <select
+                    value={formData.technicianId || currentUser?.id || ''}
+                    onChange={(e) => setFormData({ ...formData, technicianId: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+                  >
+                    {technicians.filter((technician) => technician.status === 'active').map((technician) => (
+                      <option key={technician.id} value={technician.id}>
+                        {technician.name}{technician.specialization ? ` — ${technician.specialization}` : ''}
+                      </option>
+                    ))}
+                    {!technicians.some((technician) => technician.id === (formData.technicianId || currentUser?.id)) && currentUser && (
+                      <option value={currentUser.id}>{currentUser.name}</option>
+                    )}
+                  </select>
                 </div>
 
                 <div>

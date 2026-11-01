@@ -22,6 +22,7 @@ import { RemindersView } from './components/RemindersView.tsx';
 import { ReportDetailModal } from './components/ReportDetailModal.tsx';
 import { CompanySettingsModal } from './components/CompanySettingsModal.tsx';
 import { ProfileSettingsModal } from './components/ProfileSettingsModal.tsx';
+import { TeamTechniciansModal } from './components/TeamTechniciansModal.tsx';
 import { OfflineIndicator } from './components/OfflineIndicator.tsx';
 import { LoadingOverlay } from './components/LoadingOverlay.tsx';
 import { initialCompanySettings } from './server/seedData.ts';
@@ -29,6 +30,7 @@ import { initialCompanySettings } from './server/seedData.ts';
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [technicians, setTechnicians] = useState<User[]>([]);
   const [categories, setCategories] = useState<EquipmentCategory[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [schedules, setSchedules] = useState<ServiceSchedule[]>([]);
@@ -49,6 +51,7 @@ export default function App() {
   const [viewingReport, setViewingReport] = useState<ServiceReport | null>(null);
   const [showCompanySettings, setShowCompanySettings] = useState<boolean>(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
+  const [showTeamTechnicians, setShowTeamTechnicians] = useState(false);
 
   // Initial load
   const loadAllData = useCallback(async () => {
@@ -57,6 +60,7 @@ export default function App() {
     try {
       const [
         curUserRes,
+        usersRes,
         catsRes,
         eqRes,
         schRes,
@@ -66,6 +70,7 @@ export default function App() {
         statRes,
       ] = await Promise.allSettled([
         api.getCurrentUser(),
+        api.getUsers(),
         api.getCategories(),
         api.getEquipment(),
         api.getSchedules(),
@@ -76,6 +81,7 @@ export default function App() {
       ]);
 
       if (curUserRes.status === 'fulfilled') setCurrentUser(curUserRes.value);
+      if (usersRes.status === 'fulfilled') setTechnicians(usersRes.value);
       if (catsRes.status === 'fulfilled') setCategories(catsRes.value);
       if (eqRes.status === 'fulfilled') setEquipment(eqRes.value);
       if (schRes.status === 'fulfilled') setSchedules(schRes.value);
@@ -85,6 +91,7 @@ export default function App() {
       if (statRes.status === 'fulfilled') setStats(statRes.value);
       const failedRequests = [
         curUserRes,
+        usersRes,
         catsRes,
         eqRes,
         schRes,
@@ -287,6 +294,23 @@ export default function App() {
     setCurrentUser(updated);
   };
 
+  const handleCreateTechnician = async (data: Partial<User>) => {
+    try {
+      const created = await runWithLoading('Mendaftarkan teknisi...', () =>
+        api.createUser({
+          ...data,
+          role: 'technician',
+          status: 'active',
+        })
+      );
+      setTechnicians((current) => [...current, created]);
+      return created;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Terjadi kesalahan yang tidak diketahui.';
+      throw new Error(`Gagal mendaftarkan teknisi: ${message}`);
+    }
+  };
+
   const pendingRemindersCount = reminders.filter((r) => r.status === 'pending').length;
   const upcomingSchedulesCount = schedules.filter((s) => s.status !== 'Completed').length;
 
@@ -376,7 +400,9 @@ export default function App() {
             <ScheduleView
               schedules={schedules}
               equipment={equipment}
+              technicians={technicians}
               currentUser={currentUser}
+              onManageTechnicians={() => setShowTeamTechnicians(true)}
               onSaveSchedule={handleSaveSchedule}
               onDeleteSchedule={handleDeleteSchedule}
               onStartReportFromSchedule={handleStartReportFromSchedule}
@@ -448,6 +474,13 @@ export default function App() {
           user={currentUser}
           onSave={handleSaveProfile}
           onClose={() => setShowProfileSettings(false)}
+        />
+      )}
+      {showTeamTechnicians && (
+        <TeamTechniciansModal
+          technicians={technicians.filter((technician) => technician.role === 'technician' && technician.status === 'active')}
+          onCreateTechnician={handleCreateTechnician}
+          onClose={() => setShowTeamTechnicians(false)}
         />
       )}
       {pendingAction && <LoadingOverlay label={pendingAction} />}

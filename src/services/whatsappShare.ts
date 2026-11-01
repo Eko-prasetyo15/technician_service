@@ -3,40 +3,55 @@ import { generateServiceReportPDF } from './pdfGenerator.ts';
 
 export const buildWhatsAppMessage = (report: ServiceReport, company?: CompanySettings): string => {
   const companyName = company?.companyName || 'PT CAHAYA PERDANA NUSANTARA';
-  
-  const text = `*LAPORAN PEKERJAAN TEKNISI*
+
+  return `*LAPORAN PEKERJAAN TEKNISI*
 _${companyName}_
 
 *No. Laporan:* ${report.reportNumber}
 *Peralatan:* ${report.equipmentName} (${report.brandModel || '-'})
-*Lokasi:* ${report.location}
+${report.serialNumber ? `*No. Seri:* ${report.serialNumber}\n` : ''}*Lokasi:* ${report.location}
 *Tanggal/Jam:* ${report.jobDate} | ${report.jobTime || '09:00'} WIB
 *Jenis Pekerjaan:* ${report.jobType}
 *Teknisi:* ${report.technicianName}
 
----------------------------------
-*1. Temuan / Masalah:*
-${report.findings}
+*Kondisi Sebelum:*
+${report.conditionBefore || '-'}
 
-*2. Tindakan Perbaikan:*
-${report.actionTaken}
+*Temuan / Masalah:*
+${report.findings || '-'}
 
-*3. Suku Cadang:*
+*Tindakan Perbaikan:*
+${report.actionTaken || '-'}
+
+*Suku Cadang:*
 ${report.spareParts || 'Tidak ada'}
 
-*4. Kondisi Akhir:*
-${report.conditionAfter}
+*Kondisi Akhir:*
+${report.conditionAfter || '-'}
 
-*5. Rekomendasi:*
+*Rekomendasi:*
 ${report.recommendations || 'Peralatan siap dioperasikan normal'}
----------------------------------
+${report.additionalNotes ? `\n*Catatan Tambahan:*\n${report.additionalNotes}` : ''}
+${report.photos?.length ? `\n*Dokumentasi:* ${report.photos.length} foto tercatat di laporan.` : ''}
 _Laporan resmi telah diarsipkan di Internal Technician Service App._`;
-
-  return text;
 };
 
-export const shareViaWhatsApp = (report: ServiceReport, company?: CompanySettings, phoneNumber?: string) => {
+export const shareViaWhatsApp = async (report: ServiceReport, company?: CompanySettings, phoneNumber?: string) => {
   const message = buildWhatsAppMessage(report, company);
+
+  if (!phoneNumber?.trim() && typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({
+        title: `Laporan Service - ${report.reportNumber}`,
+        text: message,
+      });
+      return;
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return;
+      console.warn('Native text sharing failed, falling back to WhatsApp link:', error);
+    }
+  }
+
   const encoded = encodeURIComponent(message);
   
   let url = `https://wa.me/?text=${encoded}`;
