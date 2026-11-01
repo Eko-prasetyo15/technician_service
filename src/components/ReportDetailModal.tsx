@@ -30,13 +30,18 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
   const [waPhone, setWaPhone] = useState('');
   const [showWaInput, setShowWaInput] = useState(false);
   const [activePhoto, setActivePhoto] = useState<string | null>(null);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   const handleDownloadPDF = async () => {
+    setIsDownloadingPdf(true);
     try {
       await downloadReportPDF(report, company);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Terjadi kesalahan saat membuat PDF.';
       alert(`Gagal membuat PDF laporan: ${message}`);
+    } finally {
+      setIsDownloadingPdf(false);
     }
   };
 
@@ -50,7 +55,12 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
   };
 
   const handleNativeShare = async () => {
-    await shareNativeOrPDF(report, company);
+    setIsSharing(true);
+    try {
+      await shareNativeOrPDF(report, company);
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   return (
@@ -105,11 +115,12 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
             {/* Native Share */}
             <button
               onClick={handleNativeShare}
-              className="flex items-center gap-1.5 border border-slate-300 hover:bg-white text-slate-700 font-semibold px-3 py-1.5 rounded-xl transition"
+              disabled={isSharing || isDownloadingPdf}
+              className="flex items-center gap-1.5 border border-slate-300 hover:bg-white text-slate-700 font-semibold px-3 py-1.5 rounded-xl transition disabled:cursor-wait disabled:opacity-60"
               title="Bagikan melalui menu Share perangkat"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Bagikan</span>
+              <span className="hidden sm:inline">{isSharing ? 'Menyiapkan...' : 'Bagikan'}</span>
             </button>
 
             {/* Print */}
@@ -125,10 +136,11 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
             {/* PDF Download */}
             <button
               onClick={handleDownloadPDF}
-              className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white font-bold px-3.5 py-1.5 rounded-xl transition shadow-sm"
+              disabled={isDownloadingPdf || isSharing}
+              className="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-500 text-white font-bold px-3.5 py-1.5 rounded-xl transition shadow-sm disabled:cursor-wait disabled:opacity-60"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Unduh PDF A4</span>
+              <span>{isDownloadingPdf ? 'Menyiapkan PDF...' : 'Unduh PDF A4'}</span>
             </button>
           </div>
         </div>

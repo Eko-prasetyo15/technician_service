@@ -21,6 +21,7 @@ import { RemindersView } from './components/RemindersView.tsx';
 import { ReportDetailModal } from './components/ReportDetailModal.tsx';
 import { CompanySettingsModal } from './components/CompanySettingsModal.tsx';
 import { OfflineIndicator } from './components/OfflineIndicator.tsx';
+import { LoadingOverlay } from './components/LoadingOverlay.tsx';
 import { initialCompanySettings } from './server/seedData.ts';
 
 export default function App() {
@@ -34,6 +35,9 @@ export default function App() {
   const [company, setCompany] = useState<CompanySettings>(initialCompanySettings);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   // Prefill state for report form
   const [activeReportSchedule, setActiveReportSchedule] = useState<ServiceSchedule | null>(null);
@@ -45,6 +49,8 @@ export default function App() {
 
   // Initial load
   const loadAllData = useCallback(async () => {
+    setIsRefreshing(true);
+    setLoadError(null);
     try {
       const [
         curUserRes,
@@ -74,85 +80,127 @@ export default function App() {
       if (remRes.status === 'fulfilled') setReminders(remRes.value);
       if (compRes.status === 'fulfilled') setCompany(compRes.value);
       if (statRes.status === 'fulfilled') setStats(statRes.value);
+      const failedRequests = [
+        curUserRes,
+        catsRes,
+        eqRes,
+        schRes,
+        repRes,
+        remRes,
+        compRes,
+        statRes,
+      ].filter((result) => result.status === 'rejected');
+      if (failedRequests.length > 0) {
+        setLoadError(`${failedRequests.length} bagian data gagal dimuat. Periksa koneksi, lalu coba muat ulang.`);
+      }
     } catch (err) {
       console.error('Failed to load application data', err);
+      setLoadError('Data aplikasi gagal dimuat. Periksa koneksi, lalu coba muat ulang.');
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   }, []);
+
+  const runWithLoading = async <T,>(label: string, action: () => Promise<T>): Promise<T> => {
+    setPendingAction(label);
+    try {
+      return await action();
+    } finally {
+      setPendingAction(null);
+    }
+  };
 
   useEffect(() => {
     loadAllData();
   }, [loadAllData]);
 
-  // Category CRUD (Managed directly by Technician Irfan)
+  // Category CRUD
   const handleSaveCategory = async (data: Partial<EquipmentCategory>, isEdit: boolean) => {
     try {
-      if (isEdit && data.id) {
-        await api.updateCategory(data.id, data);
-      } else {
-        await api.createCategory(data);
-      }
-      await loadAllData();
+      await runWithLoading(isEdit ? 'Menyimpan perubahan kategori...' : 'Menambahkan kategori...', async () => {
+        if (isEdit && data.id) {
+          await api.updateCategory(data.id, data);
+        } else {
+          await api.createCategory(data);
+        }
+        await loadAllData();
+      });
     } catch (err: any) {
       alert(`Gagal menyimpan kategori: ${err.message}`);
+      throw err;
     }
   };
 
   const handleDeleteCategory = async (id: string) => {
     try {
-      await api.deleteCategory(id);
-      await loadAllData();
+      await runWithLoading('Menghapus kategori...', async () => {
+        await api.deleteCategory(id);
+        await loadAllData();
+      });
     } catch (err: any) {
       alert(`Gagal menghapus kategori: ${err.message}`);
+      throw err;
     }
   };
 
   // Equipment CRUD
   const handleSaveEquipment = async (data: Partial<Equipment>, isEdit: boolean) => {
     try {
-      if (isEdit && data.id) {
-        await api.updateEquipment(data.id, data);
-      } else {
-        await api.createEquipment(data);
-      }
-      await loadAllData();
+      await runWithLoading(isEdit ? 'Menyimpan perubahan peralatan...' : 'Menambahkan peralatan...', async () => {
+        if (isEdit && data.id) {
+          await api.updateEquipment(data.id, data);
+        } else {
+          await api.createEquipment(data);
+        }
+        await loadAllData();
+      });
     } catch (err: any) {
       alert(`Gagal menyimpan data peralatan: ${err.message}`);
+      throw err;
     }
   };
 
   const handleDeleteEquipment = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus data peralatan ini?')) return;
     try {
-      await api.deleteEquipment(id);
-      await loadAllData();
+      await runWithLoading('Menghapus peralatan...', async () => {
+        await api.deleteEquipment(id);
+        await loadAllData();
+      });
     } catch (err: any) {
       alert(`Gagal menghapus peralatan: ${err.message}`);
+      throw err;
     }
   };
 
   // Schedule CRUD
   const handleSaveSchedule = async (data: Partial<ServiceSchedule>, isEdit: boolean) => {
     try {
-      if (isEdit && data.id) {
-        await api.updateSchedule(data.id, data);
-      } else {
-        await api.createSchedule(data);
-      }
-      await loadAllData();
+      await runWithLoading(isEdit ? 'Menyimpan perubahan jadwal...' : 'Membuat jadwal...', async () => {
+        if (isEdit && data.id) {
+          await api.updateSchedule(data.id, data);
+        } else {
+          await api.createSchedule(data);
+        }
+        await loadAllData();
+      });
     } catch (err: any) {
       alert(`Gagal menyimpan jadwal: ${err.message}`);
+      throw err;
     }
   };
 
   const handleDeleteSchedule = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus jadwal ini?')) return;
     try {
-      await api.deleteSchedule(id);
-      await loadAllData();
+      await runWithLoading('Menghapus jadwal...', async () => {
+        await api.deleteSchedule(id);
+        await loadAllData();
+      });
     } catch (err: any) {
       alert(`Gagal menghapus jadwal: ${err.message}`);
+      throw err;
     }
   };
 
@@ -173,8 +221,11 @@ export default function App() {
   // Submit Report
   const handleSubmitReport = async (reportPayload: Partial<ServiceReport>, isOffline: boolean) => {
     try {
-      const created = await api.createReport(reportPayload);
-      await loadAllData();
+      const created = await runWithLoading('Mengirim laporan...', async () => {
+        const report = await api.createReport(reportPayload);
+        await loadAllData();
+        return report;
+      });
       setActiveReportSchedule(null);
       setActiveReportEquipment(null);
       setViewingReport(created);
@@ -189,32 +240,39 @@ export default function App() {
   // Reminders Actions
   const handleAcknowledgeReminder = async (id: string) => {
     try {
-      await api.acknowledgeReminder(id);
-      const rems = await api.getReminders();
-      setReminders(rems);
-      const st = await api.getStats();
-      setStats(st);
+      await runWithLoading('Memperbarui pengingat...', async () => {
+        await api.acknowledgeReminder(id);
+        const rems = await api.getReminders();
+        setReminders(rems);
+        const st = await api.getStats();
+        setStats(st);
+      });
     } catch (err: any) {
       alert(`Gagal mengonfirmasi pengingat: ${err.message}`);
+      throw err;
     }
   };
 
   const handleTriggerReminderScan = async () => {
     try {
-      await api.processReminders();
-      await loadAllData();
+      await runWithLoading('Memindai jadwal...', async () => {
+        await api.processReminders();
+        await loadAllData();
+      });
     } catch (err: any) {
       alert(`Gagal memindai jadwal: ${err.message}`);
+      throw err;
     }
   };
 
   // Company settings save
   const handleSaveCompanySettings = async (data: Partial<CompanySettings>) => {
     try {
-      const updated = await api.updateCompanySettings(data);
+      const updated = await runWithLoading('Menyimpan pengaturan perusahaan...', () => api.updateCompanySettings(data));
       setCompany(updated);
     } catch (err: any) {
       alert(`Gagal menyimpan pengaturan perusahaan: ${err.message}`);
+      throw err;
     }
   };
 
@@ -261,6 +319,19 @@ export default function App() {
 
         {/* Main Content Area */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 min-w-0">
+          {loadError && (
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="alert">
+              <span>{loadError}</span>
+              <button
+                type="button"
+                onClick={loadAllData}
+                disabled={isRefreshing}
+                className="rounded-lg bg-amber-100 px-3 py-1.5 font-semibold hover:bg-amber-200 disabled:cursor-wait disabled:opacity-60"
+              >
+                {isRefreshing ? 'Memuat ulang...' : 'Muat ulang'}
+              </button>
+            </div>
+          )}
           {activeTab === 'dashboard' && (
             <DashboardView
               stats={stats}
@@ -360,6 +431,7 @@ export default function App() {
           onClose={() => setShowCompanySettings(false)}
         />
       )}
+      {pendingAction && <LoadingOverlay label={pendingAction} />}
     </div>
   );
 }

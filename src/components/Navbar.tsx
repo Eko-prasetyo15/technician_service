@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  Wrench, 
   Building2, 
   Wifi, 
   WifiOff, 
@@ -41,9 +40,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('dashboard')} 
             className="flex items-center gap-2.5 text-left group"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-sky-500/20 group-hover:scale-105 transition">
-              <Wrench className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src="/K3.svg"
+              alt="Logo K3"
+              className="h-10 w-10 rounded-xl object-contain shadow-lg shadow-slate-950/20 transition group-hover:scale-105"
+            />
             <div>
               <div className="font-extrabold text-sm sm:text-base tracking-tight text-white leading-tight flex items-center gap-1.5">
                 <span>TECH SERVICE</span>
@@ -123,7 +124,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div className="hidden sm:block text-left">
               <div className="font-bold text-slate-100 text-xs flex items-center gap-1.5">
-                <span>{currentUser?.name || 'Irfan'}</span>
+                <span>{currentUser?.name || 'Irfan Rusmana'}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               </div>
               <div className="text-[10px] text-sky-300 font-medium">

@@ -21,7 +21,8 @@ import {
   Trash2, 
   X,
   User as UserIcon,
-  Filter
+  Filter,
+  LoaderCircle
 } from 'lucide-react';
 
 interface ScheduleViewProps {
@@ -47,13 +48,14 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
   // Modal states
   const [showModal, setShowModal] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<ServiceSchedule | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Form states
   const [formData, setFormData] = useState<Partial<ServiceSchedule>>({
     title: '',
     equipmentId: equipment[0]?.id || '',
     technicianId: 'usr-irfan',
-    technicianName: 'Irfan',
+    technicianName: currentUser?.name || 'Irfan Rusmana',
     scheduledDate: new Date().toISOString().split('T')[0],
     scheduledTime: '09:00',
     jobType: 'Preventive Maintenance',
@@ -69,7 +71,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
       title: firstEq ? `Perawatan Rutin ${firstEq.name}` : 'Maintenance Rutin',
       equipmentId: firstEq?.id || '',
       technicianId: 'usr-irfan',
-      technicianName: 'Irfan',
+      technicianName: currentUser?.name || 'Irfan Rusmana',
       scheduledDate: new Date().toISOString().split('T')[0],
       scheduledTime: '09:00',
       jobType: 'Preventive Maintenance',
@@ -105,18 +107,25 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
 
     const eq = equipment.find((e) => e.id === formData.equipmentId);
 
-    await onSaveSchedule(
-      {
-        ...formData,
-        equipmentName: eq?.name || '',
-        location: eq?.location || '',
-        technicianId: 'usr-irfan',
-        technicianName: 'Irfan',
-        ...(editingSchedule ? { id: editingSchedule.id } : {}),
-      },
-      !!editingSchedule
-    );
-    setShowModal(false);
+    setIsSaving(true);
+    try {
+      await onSaveSchedule(
+        {
+          ...formData,
+          equipmentName: eq?.name || '',
+          location: eq?.location || '',
+          technicianId: currentUser?.id || 'usr-irfan',
+          technicianName: currentUser?.name || 'Irfan Rusmana',
+          ...(editingSchedule ? { id: editingSchedule.id } : {}),
+        },
+        !!editingSchedule
+      );
+      setShowModal(false);
+    } catch {
+      // The parent displays the API error; keep the form open for retry.
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Filter schedules
@@ -302,7 +311,13 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => onDeleteSchedule(sch.id)}
+                        onClick={async () => {
+                          try {
+                            await onDeleteSchedule(sch.id);
+                          } catch {
+                            // The parent displays the API error.
+                          }
+                        }}
                         className="p-2 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50"
                         title="Hapus Jadwal"
                       >
@@ -438,7 +453,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                     Teknisi Pelaksana
                   </label>
                   <div className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-bold flex items-center justify-between">
-                    <span>Irfan</span>
+                    <span>{currentUser?.name || 'Irfan Rusmana'}</span>
                     <span className="text-[10px] text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full font-semibold">Teknisi Maintenance</span>
                   </div>
                 </div>
@@ -512,6 +527,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
+                  disabled={isSaving}
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold"
                 >
@@ -519,9 +535,11 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold transition shadow-md"
+                  disabled={isSaving}
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold transition shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {editingSchedule ? 'Simpan Jadwal' : 'Jadwalkan'}
+                  {isSaving && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                  {isSaving ? 'Menyimpan...' : editingSchedule ? 'Simpan Jadwal' : 'Jadwalkan'}
                 </button>
               </div>
             </form>

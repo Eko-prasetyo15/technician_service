@@ -65,7 +65,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               Internal Maintenance System
             </div>
             <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-              Halo, Irfan!
+              Halo, {currentUser?.name || 'Irfan Rusmana'}!
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
               Aplikasi kerja teknisi: atur kategori & peralatan, kelola jadwal maintenance, catat hasil service, dan unggah foto dokumentasi langsung dari perangkat Anda.

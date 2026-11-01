@@ -47,6 +47,8 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
 }) => {
   const [filterType, setFilterType] = useState<string>('all');
   const [isScanning, setIsScanning] = useState(false);
+  const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
+  const [isUpdatingNotification, setIsUpdatingNotification] = useState(false);
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>('default');
   const [notifSupported, setNotifSupported] = useState(true);
   const [testSent, setTestSent] = useState(false);
@@ -58,20 +60,36 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
   }, []);
 
   const handleEnableNotification = async () => {
-    const perm = await requestNotificationPermission();
-    setNotifPermission(perm);
-    if (perm === 'granted') {
-      await sendTestNotification();
-      setTestSent(true);
-      setTimeout(() => setTestSent(false), 4000);
+    setIsUpdatingNotification(true);
+    try {
+      const perm = await requestNotificationPermission();
+      setNotifPermission(perm);
+      if (perm === 'granted') {
+        await sendTestNotification();
+        setTestSent(true);
+        setTimeout(() => setTestSent(false), 4000);
+      }
+    } catch (error) {
+      console.error('Failed to enable notifications:', error);
+      alert('Gagal mengaktifkan notifikasi. Periksa izin notifikasi browser Anda.');
+    } finally {
+      setIsUpdatingNotification(false);
     }
   };
 
   const handleSendTest = async () => {
-    const ok = await sendTestNotification();
-    if (ok) {
-      setTestSent(true);
-      setTimeout(() => setTestSent(false), 4000);
+    setIsUpdatingNotification(true);
+    try {
+      const ok = await sendTestNotification();
+      if (ok) {
+        setTestSent(true);
+        setTimeout(() => setTestSent(false), 4000);
+      }
+    } catch (error) {
+      console.error('Failed to send test notification:', error);
+      alert('Gagal mengirim notifikasi percobaan.');
+    } finally {
+      setIsUpdatingNotification(false);
     }
   };
 
@@ -92,8 +110,21 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
           );
         }
       }
+    } catch {
+      // The parent displays the API error.
     } finally {
       setIsScanning(false);
+    }
+  };
+
+  const handleAcknowledge = async (id: string) => {
+    setAcknowledgingId(id);
+    try {
+      await onAcknowledgeReminder(id);
+    } catch {
+      // The parent displays the API error.
+    } finally {
+      setAcknowledgingId(null);
     }
   };
 
@@ -109,7 +140,7 @@ _${urgency}_
 *Kategori:* ${rem.categoryName}
 *Lokasi:* ${rem.location}
 *Tanggal Jatuh Tempo:* ${rem.dueDate}
-*Teknisi:* Irfan
+*Teknisi:* ${currentUser?.name || 'Irfan Rusmana'}
 
 _Mohon segera dijadwalkan perawatan preventif untuk menjaga performa operasional._`;
 
@@ -179,15 +210,17 @@ _Mohon segera dijadwalkan perawatan preventif untuk menjaga performa operasional
             {notifPermission !== 'granted' ? (
               <button
                 onClick={handleEnableNotification}
-                className="flex items-center gap-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2 text-xs sm:text-sm shadow-md transition active:scale-95"
+                disabled={isUpdatingNotification}
+                className="flex items-center gap-1.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-4 py-2 text-xs sm:text-sm shadow-md transition active:scale-95 disabled:cursor-wait disabled:opacity-60"
               >
-                <BellRing className="w-4 h-4" />
-                <span>Izinkan Notifikasi di HP</span>
+                <BellRing className={`w-4 h-4 ${isUpdatingNotification ? 'animate-pulse' : ''}`} />
+                <span>{isUpdatingNotification ? 'Memproses...' : 'Izinkan Notifikasi di HP'}</span>
               </button>
             ) : (
               <button
                 onClick={handleSendTest}
-                className="flex items-center gap-1.5 rounded-xl bg-sky-600/30 hover:bg-sky-600/40 text-sky-200 border border-sky-400/30 font-semibold px-3.5 py-2 text-xs sm:text-sm transition"
+                disabled={isUpdatingNotification}
+                className="flex items-center gap-1.5 rounded-xl bg-sky-600/30 hover:bg-sky-600/40 text-sky-200 border border-sky-400/30 font-semibold px-3.5 py-2 text-xs sm:text-sm transition disabled:cursor-wait disabled:opacity-60"
               >
                 <Bell className="w-3.5 h-3.5" />
                 <span>{testSent ? 'Notifikasi Terkirim!' : 'Tes Notifikasi HP'}</span>
@@ -352,7 +385,7 @@ _Mohon segera dijadwalkan perawatan preventif untuk menjaga performa operasional
                     <span>•</span>
                     <span>Tanggal Jatuh Tempo: <strong className={isOverdue ? 'text-rose-600 font-bold' : 'text-slate-800'}>{rem.dueDate}</strong></span>
                     <span>•</span>
-                    <span>Teknisi Pelaksana: <strong className="text-sky-700">Irfan</strong></span>
+                    <span>Teknisi Pelaksana: <strong className="text-sky-700">{currentUser?.name || 'Irfan Rusmana'}</strong></span>
                   </div>
                 </div>
 
@@ -368,11 +401,12 @@ _Mohon segera dijadwalkan perawatan preventif untuk menjaga performa operasional
 
                   {rem.status === 'pending' && (
                     <button
-                      onClick={() => onAcknowledgeReminder(rem.id)}
-                      className="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition"
+                      onClick={() => handleAcknowledge(rem.id)}
+                      disabled={acknowledgingId === rem.id}
+                      className="px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition disabled:cursor-wait disabled:opacity-60"
                       title="Tandai sudah dibaca"
                     >
-                      Konfirmasi
+                      {acknowledgingId === rem.id ? 'Menyimpan...' : 'Konfirmasi'}
                     </button>
                   )}
 

@@ -27,6 +27,8 @@ export const CompanySettingsModal: React.FC<CompanySettingsModalProps> = ({
         setSavedSuccess(false);
         onClose();
       }, 1000);
+    } catch {
+      // The parent displays the API error; keep the modal open for retry.
     } finally {
       setIsSaving(false);
     }

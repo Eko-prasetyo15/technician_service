@@ -21,7 +21,8 @@ import {
   FolderPlus,
   Tag,
   CheckCircle2, 
-  Layers
+  Layers,
+  LoaderCircle
 } from 'lucide-react';
 
 interface EquipmentViewProps {
@@ -70,6 +71,9 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
   // Inline category add in equipment modal
   const [showInlineCatAdd, setShowInlineCatAdd] = useState(false);
   const [inlineCatName, setInlineCatName] = useState('');
+  const [isSavingEquipment, setIsSavingEquipment] = useState(false);
+  const [isSavingCategory, setIsSavingCategory] = useState(false);
+  const [isSavingInlineCategory, setIsSavingInlineCategory] = useState(false);
 
   // Equipment Form input states
   const [formData, setFormData] = useState<Partial<Equipment>>({
@@ -133,16 +137,23 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
       return;
     }
     const cat = categories.find((c) => c.id === formData.categoryId);
-    await onSaveEquipment(
-      {
-        ...formData,
-        categoryName: cat?.name || 'General',
-        maintenanceIntervalDays: Number(formData.maintenanceIntervalDays) || 30,
-        ...(editingEquipment ? { id: editingEquipment.id } : {}),
-      },
-      !!editingEquipment
-    );
-    setShowFormModal(false);
+    setIsSavingEquipment(true);
+    try {
+      await onSaveEquipment(
+        {
+          ...formData,
+          categoryName: cat?.name || 'General',
+          maintenanceIntervalDays: Number(formData.maintenanceIntervalDays) || 30,
+          ...(editingEquipment ? { id: editingEquipment.id } : {}),
+        },
+        !!editingEquipment
+      );
+      setShowFormModal(false);
+    } catch {
+      // The parent displays the API error; keep the form open for correction or retry.
+    } finally {
+      setIsSavingEquipment(false);
+    }
   };
 
   // Category modal handlers
@@ -167,17 +178,24 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
       alert('Nama kategori wajib diisi.');
       return;
     }
-    await onSaveCategory(
-      {
-        name: categoryForm.name.trim(),
-        code: categoryForm.code.trim() || categoryForm.name.slice(0, 4).toUpperCase(),
-        description: categoryForm.description.trim(),
-        ...(editingCategory ? { id: editingCategory.id } : {}),
-      },
-      !!editingCategory
-    );
-    setEditingCategory(null);
-    setCategoryForm({ name: '', code: '', description: '' });
+    setIsSavingCategory(true);
+    try {
+      await onSaveCategory(
+        {
+          name: categoryForm.name.trim(),
+          code: categoryForm.code.trim() || categoryForm.name.slice(0, 4).toUpperCase(),
+          description: categoryForm.description.trim(),
+          ...(editingCategory ? { id: editingCategory.id } : {}),
+        },
+        !!editingCategory
+      );
+      setEditingCategory(null);
+      setCategoryForm({ name: '', code: '', description: '' });
+    } catch {
+      // The parent displays the API error; preserve the form for retry.
+    } finally {
+      setIsSavingCategory(false);
+    }
   };
 
   // Inline add category directly while filling equipment form
@@ -185,9 +203,16 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
     if (!inlineCatName.trim()) return;
     const catName = inlineCatName.trim();
     const code = catName.slice(0, 4).toUpperCase();
-    await onSaveCategory({ name: catName, code, description: '' }, false);
-    setInlineCatName('');
-    setShowInlineCatAdd(false);
+    setIsSavingInlineCategory(true);
+    try {
+      await onSaveCategory({ name: catName, code, description: '' }, false);
+      setInlineCatName('');
+      setShowInlineCatAdd(false);
+    } catch {
+      // The parent displays the API error; preserve the input for retry.
+    } finally {
+      setIsSavingInlineCategory(false);
+    }
   };
 
   // Filter equipment
@@ -369,7 +394,13 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => onDeleteEquipment(eq.id)}
+                      onClick={async () => {
+                        try {
+                          await onDeleteEquipment(eq.id);
+                        } catch {
+                          // The parent displays the API error.
+                        }
+                      }}
                       className="p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition"
                       title="Hapus Peralatan"
                     >
@@ -465,9 +496,12 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
                 <div className="flex justify-end pt-1">
                   <button
                     type="submit"
+                    disabled={isSavingCategory}
                     className="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition shadow-xs"
                   >
-                    {editingCategory ? 'Simpan Perubahan' : 'Tambahkan Kategori'}
+                    {isSavingCategory
+                      ? <><LoaderCircle className="mr-1 inline h-3.5 w-3.5 animate-spin" />Menyimpan...</>
+                      : editingCategory ? 'Simpan Perubahan' : 'Tambahkan Kategori'}
                   </button>
                 </div>
               </form>
@@ -520,7 +554,11 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
                                 return;
                               }
                               if (confirm(`Hapus kategori "${cat.name}"?`)) {
-                                await onDeleteCategory(cat.id);
+                                try {
+                                  await onDeleteCategory(cat.id);
+                                } catch {
+                                  // The parent displays the API error.
+                                }
                               }
                             }}
                             className="p-1.5 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600"
@@ -735,9 +773,10 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
                     <button
                       type="button"
                       onClick={handleSaveInlineCategory}
+                      disabled={isSavingInlineCategory}
                       className="px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-lg transition"
                     >
-                      Simpan
+                      {isSavingInlineCategory ? 'Menyimpan...' : 'Simpan'}
                     </button>
                     <button
                       type="button"
@@ -862,9 +901,10 @@ export const EquipmentView: React.FC<EquipmentViewProps> = ({
                 </button>
                 <button
                   type="submit"
+                  disabled={isSavingEquipment}
                   className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold transition shadow-md"
                 >
-                  {editingEquipment ? 'Simpan Perubahan' : 'Tambahkan'}
+                  {isSavingEquipment ? 'Menyimpan...' : editingEquipment ? 'Simpan Perubahan' : 'Tambahkan'}
                 </button>
               </div>
             </form>

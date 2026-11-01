@@ -257,7 +257,7 @@ export const ReportFormView: React.FC<ReportFormViewProps> = ({
       serialNumber: currentEquipment.serialNumber,
       location: currentEquipment.location,
       technicianId: currentUser?.id || 'usr-irfan',
-      technicianName: currentUser?.name || 'Irfan',
+      technicianName: currentUser?.name || 'Irfan Rusmana',
       jobDate,
       jobTime,
       jobType,
