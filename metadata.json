@@ -1,6 +1,5 @@
 {
   "name": "Internal Technician Service App",
   "description": "Aplikasi internal manajemen perawatan peralatan, jadwal maintenance, laporan teknisi, dan pengingat service.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "requestFramePermissions": []
 }

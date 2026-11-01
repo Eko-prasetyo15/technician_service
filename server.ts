@@ -14,24 +14,13 @@ const asyncRoute = (
   Promise.resolve(handler(req, res)).catch(next);
 };
 
-async function startServer() {
+export async function createApp() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
 
   await db.initialize(async (reports) => (await uploadReportPhotos(reports)).reports);
 
   app.use(express.json({ limit: '25mb' }));
   app.use(express.urlencoded({ extended: true, limit: '25mb' }));
-
-  // --- AUTOMATED CRON JOB FOR SERVICE REMINDERS ---
-  // Runs automatically on server start and every 60 seconds
-  console.log('[Automated Cron] Initializing service maintenance reminder engine...');
-  await db.processReminders();
-  const reminderCron = setInterval(() => {
-    db.processReminders().catch((error) => {
-      console.error('[Automated Cron] Error checking maintenance schedules:', error);
-    });
-  }, 60 * 1000);
 
   // --- REST API ROUTES ---
 
@@ -300,23 +289,38 @@ async function startServer() {
     res.status(500).json({ error: message });
   });
 
-  // --- VITE MIDDLEWARE IN DEV OR STATIC IN PROD ---
-  const isDev = process.env.NODE_ENV !== 'production';
+  if (!process.env.VERCEL) {
+    const isDev = process.env.NODE_ENV !== 'production';
 
-  if (isDev) {
-    const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.resolve(__dirname, 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.resolve(distPath, 'index.html'));
-    });
+    if (isDev) {
+      const { createServer: createViteServer } = await import('vite');
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.resolve(__dirname, 'dist');
+      app.use(express.static(distPath));
+      app.get('*', (_req: Request, res: Response) => {
+        res.sendFile(path.resolve(distPath, 'index.html'));
+      });
+    }
   }
+
+  return app;
+}
+
+async function startServer() {
+  const app = await createApp();
+  const PORT = Number(process.env.PORT) || 3000;
+
+  console.log('[Automated Cron] Initializing service maintenance reminder engine...');
+  const reminderCron = setInterval(() => {
+    db.processReminders().catch((error) => {
+      console.error('[Automated Cron] Error checking maintenance schedules:', error);
+    });
+  }, 60 * 1000);
 
   const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`[Technician App] Server running on http://0.0.0.0:${PORT}`);
@@ -338,7 +342,9 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
-  console.error('Fatal server startup error:', err);
-  process.exit(1);
-});
+if (process.env.VERCEL !== '1') {
+  startServer().catch((err) => {
+    console.error('Fatal server startup error:', err);
+    process.exit(1);
+  });
+}
