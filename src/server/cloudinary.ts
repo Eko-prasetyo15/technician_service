@@ -11,6 +11,11 @@ export interface UploadedReports {
   publicIds: string[];
 }
 
+export interface UploadedProfileImage {
+  url: string;
+  publicId: string;
+}
+
 const configureCloudinary = () => {
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
   if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
@@ -23,6 +28,18 @@ const configureCloudinary = () => {
     api_secret: CLOUDINARY_API_SECRET,
     secure: true,
   });
+};
+
+export const uploadProfileImage = async (dataUrl: string): Promise<UploadedProfileImage> => {
+  if (!dataUrl.startsWith('data:image/')) {
+    throw new Error('Invalid profile image data URL.');
+  }
+  configureCloudinary();
+  const result = await cloudinary.uploader.upload(dataUrl, {
+    folder: 'internal-technician-service-app/profiles',
+    resource_type: 'image',
+  });
+  return { url: result.secure_url, publicId: result.public_id };
 };
 
 const uploadPhoto = async (photo: ServiceReportPhoto): Promise<UploadedPhoto> => {

@@ -115,6 +115,17 @@ export interface User {
   role: 'admin' | 'technician';
   specialization: string;
   status: 'active' | 'inactive';
+  profileImageUrl?: string;
+  profileImagePublicId?: string;
+}
+
+export interface UserProfileUpdate {
+  name: string;
+  email: string;
+  phone: string;
+  specialization: string;
+  profileImageDataUrl?: string;
+  removeProfileImage?: boolean;
 }
 
 export interface CompanySettings {

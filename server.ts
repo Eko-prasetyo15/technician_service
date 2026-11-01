@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { ServiceReport } from './src/types/index.ts';
+import { ServiceReport, User } from './src/types/index.ts';
 import { db } from './src/server/db.ts';
-import { deleteCloudinaryImages, uploadReportPhotos } from './src/server/cloudinary.ts';
+import { deleteCloudinaryImages, uploadProfileImage, uploadReportPhotos } from './src/server/cloudinary.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,6 +74,55 @@ export async function createApp() {
     if (!updated) {
       return res.status(404).json({ error: 'User not found' });
     }
+    res.json(updated);
+  }));
+
+  app.put('/api/users/:id/profile', asyncRoute(async (req: Request, res: Response) => {
+    const { name, email, phone, specialization, profileImageDataUrl, removeProfileImage } = req.body;
+    if (typeof name !== 'string' || !name.trim() || typeof email !== 'string' || !email.trim()) {
+      return res.status(400).json({ error: 'Nama dan email wajib diisi.' });
+    }
+
+    const existing = db.getUsers().find((user) => user.id === req.params.id);
+    if (!existing) return res.status(404).json({ error: 'User not found' });
+
+    const uploaded = profileImageDataUrl ? await uploadProfileImage(profileImageDataUrl) : null;
+    const updates = {
+      name: name.trim(),
+      email: email.trim(),
+      phone: typeof phone === 'string' ? phone.trim() : '',
+      specialization: typeof specialization === 'string' ? specialization.trim() : '',
+      ...(uploaded
+        ? { profileImageUrl: uploaded.url, profileImagePublicId: uploaded.publicId }
+        : removeProfileImage
+          ? { profileImageUrl: '', profileImagePublicId: '' }
+          : {}),
+    };
+
+    let updated: User | null;
+    try {
+      updated = await db.updateUser(req.params.id, updates);
+      if (!updated) throw new Error('User not found');
+    } catch (error) {
+      if (uploaded) {
+        try {
+          await deleteCloudinaryImages([uploaded.publicId]);
+        } catch (cleanupError) {
+          console.error('Failed to clean up uploaded profile image after database error:', cleanupError);
+        }
+      }
+      throw error;
+    }
+
+    const previousPublicId = existing.profileImagePublicId;
+    if (previousPublicId && previousPublicId !== updated.profileImagePublicId) {
+      try {
+        await deleteCloudinaryImages([previousPublicId]);
+      } catch (error) {
+        console.error('Failed to delete the previous Cloudinary profile image:', error);
+      }
+    }
+
     res.json(updated);
   }));
 

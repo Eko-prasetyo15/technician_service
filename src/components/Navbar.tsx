@@ -5,8 +5,8 @@ import {
   WifiOff, 
   RefreshCw,
   Bell,
-  HardHat,
-  Settings
+  Settings,
+  UserRound,
 } from 'lucide-react';
 import { User, CompanySettings } from '../types/index.ts';
 import { PWAInstallButton } from './PWAInstallButton.tsx';
@@ -16,6 +16,7 @@ interface NavbarProps {
   currentUser: User | null;
   company: CompanySettings | null;
   onOpenCompanySettings: () => void;
+  onOpenProfileSettings: () => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   pendingRemindersCount: number;
@@ -25,6 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   company,
   onOpenCompanySettings,
+  onOpenProfileSettings,
   activeTab,
   setActiveTab,
   pendingRemindersCount,
@@ -118,9 +120,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Technician Profile Card */}
-          <div className="flex items-center gap-2 rounded-xl bg-slate-800/80 border border-slate-700/80 px-2.5 py-1.5 text-xs sm:text-sm">
-            <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-400/30 flex items-center justify-center">
-              <HardHat className="w-4 h-4" />
+          <button
+            type="button"
+            onClick={onOpenProfileSettings}
+            className="flex items-center gap-2 rounded-xl bg-slate-800/80 border border-slate-700/80 px-2.5 py-1.5 text-xs sm:text-sm hover:bg-slate-800 transition"
+            title="Edit profil"
+          >
+            <div className="w-8 h-8 rounded-full bg-sky-500/20 text-sky-400 border border-sky-400/30 flex items-center justify-center overflow-hidden">
+              {currentUser?.profileImageUrl ? (
+                <img src={currentUser.profileImageUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <UserRound className="w-4 h-4" />
+              )}
             </div>
             <div className="hidden sm:block text-left">
               <div className="font-bold text-slate-100 text-xs flex items-center gap-1.5">
@@ -128,10 +139,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               </div>
               <div className="text-[10px] text-sky-300 font-medium">
-                Teknisi Maintenance
+                {currentUser?.specialization || 'Teknisi Maintenance'}
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </header>

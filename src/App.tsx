@@ -7,7 +7,8 @@ import {
   ServiceReport, 
   ServiceReminder, 
   CompanySettings, 
-  DashboardStats 
+  DashboardStats,
+  UserProfileUpdate,
 } from './types/index.ts';
 import { api } from './services/api.ts';
 import { Navbar } from './components/Navbar.tsx';
@@ -20,6 +21,7 @@ import { HistoryView } from './components/HistoryView.tsx';
 import { RemindersView } from './components/RemindersView.tsx';
 import { ReportDetailModal } from './components/ReportDetailModal.tsx';
 import { CompanySettingsModal } from './components/CompanySettingsModal.tsx';
+import { ProfileSettingsModal } from './components/ProfileSettingsModal.tsx';
 import { OfflineIndicator } from './components/OfflineIndicator.tsx';
 import { LoadingOverlay } from './components/LoadingOverlay.tsx';
 import { initialCompanySettings } from './server/seedData.ts';
@@ -46,6 +48,7 @@ export default function App() {
   // Viewing detail modal state
   const [viewingReport, setViewingReport] = useState<ServiceReport | null>(null);
   const [showCompanySettings, setShowCompanySettings] = useState<boolean>(false);
+  const [showProfileSettings, setShowProfileSettings] = useState(false);
 
   // Initial load
   const loadAllData = useCallback(async () => {
@@ -276,6 +279,14 @@ export default function App() {
     }
   };
 
+  const handleSaveProfile = async (data: UserProfileUpdate) => {
+    if (!currentUser) throw new Error('Profil pengguna tidak ditemukan.');
+    const updated = await runWithLoading('Menyimpan profil...', () =>
+      api.updateUserProfile(currentUser.id, data)
+    );
+    setCurrentUser(updated);
+  };
+
   const pendingRemindersCount = reminders.filter((r) => r.status === 'pending').length;
   const upcomingSchedulesCount = schedules.filter((s) => s.status !== 'Completed').length;
 
@@ -302,6 +313,7 @@ export default function App() {
         currentUser={currentUser}
         company={company}
         onOpenCompanySettings={() => setShowCompanySettings(true)}
+        onOpenProfileSettings={() => setShowProfileSettings(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         pendingRemindersCount={pendingRemindersCount}
@@ -429,6 +441,13 @@ export default function App() {
           company={company}
           onSave={handleSaveCompanySettings}
           onClose={() => setShowCompanySettings(false)}
+        />
+      )}
+      {showProfileSettings && currentUser && (
+        <ProfileSettingsModal
+          user={currentUser}
+          onSave={handleSaveProfile}
+          onClose={() => setShowProfileSettings(false)}
         />
       )}
       {pendingAction && <LoadingOverlay label={pendingAction} />}

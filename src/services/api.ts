@@ -6,7 +6,8 @@ import {
   ServiceSchedule, 
   ServiceReport, 
   ServiceReminder, 
-  CompanySettings 
+  CompanySettings,
+  UserProfileUpdate,
 } from '../types/index.ts';
 
 const API_BASE = '/api';
@@ -55,6 +56,11 @@ export const api = {
     }),
   updateUser: (id: string, data: Partial<User>) =>
     fetchJson<User>(`${API_BASE}/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+  updateUserProfile: (id: string, data: UserProfileUpdate) =>
+    fetchJson<User>(`${API_BASE}/users/${id}/profile`, {
       method: 'PUT',
       body: JSON.stringify(data),
     }),

@@ -9,7 +9,7 @@ import {
   Users, 
   PlusCircle, 
   CheckCircle2,
-  HardHat
+  UserRound
 } from 'lucide-react';
 import { User } from '../types/index.ts';
 
@@ -115,8 +115,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Current user card footer */}
         <div className="mt-auto pt-4 border-t border-slate-800">
           <div className="flex items-center gap-3 px-3 py-2 bg-slate-800/50 rounded-xl border border-slate-800">
-            <div className="w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-sky-400 shrink-0">
-              <HardHat className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-sky-400 shrink-0 overflow-hidden">
+              {currentUser?.profileImageUrl ? (
+                <img src={currentUser.profileImageUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <UserRound className="w-4 h-4" />
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <div className="text-xs font-semibold text-white truncate">
