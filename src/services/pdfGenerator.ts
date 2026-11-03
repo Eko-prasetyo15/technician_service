@@ -44,9 +44,6 @@ export const generateServiceReportPDF = async (
   const borderColor = [226, 232, 240];
 
   // --- HEADER PERUSAHAAN ---
-  doc.setFillColor(navyDark[0], navyDark[1], navyDark[2]);
-  doc.rect(margin, y, 4, 22, 'F');
-
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(navyBlue[0], navyBlue[1], navyBlue[2]);
@@ -59,13 +56,18 @@ export const generateServiceReportPDF = async (
 
   doc.setFontSize(7.5);
   doc.setTextColor(textMuted[0], textMuted[1], textMuted[2]);
-  doc.text(
+  const headerDetails = doc.splitTextToSize(
     `${company.address || 'Kawasan Industri Pulogadung, Jakarta'} | Telp: ${company.phone || '-'} | Email: ${company.email || '-'}`,
-    margin + 8,
-    y + 15
+    contentWidth - 8
   );
+  const headerDetailsLineHeight = (7.5 / 2.8346) * 1.15;
+  const dividerOffset = Math.max(20, 15 + (headerDetails.length - 1) * headerDetailsLineHeight + 5);
 
-  y += 20;
+  doc.setFillColor(navyDark[0], navyDark[1], navyDark[2]);
+  doc.rect(margin, y, 4, dividerOffset + 2, 'F');
+  doc.text(headerDetails, margin + 8, y + 15, { lineHeightFactor: 1.15 });
+
+  y += dividerOffset;
 
   // Top Divider line
   doc.setDrawColor(navyBlue[0], navyBlue[1], navyBlue[2]);
